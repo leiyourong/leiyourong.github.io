@@ -64,7 +64,7 @@
     <article id="post-排序算法" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/06/19/排序算法/" class="article-date">
-  <time datetime="2017-06-19T02:56:54.544Z" itemprop="datePublished">2017-06-19</time>
+  <time datetime="2017-06-19T02:56:54.545Z" itemprop="datePublished">2017-06-19</time>
 </a>
     
   </div>
@@ -118,7 +118,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/06/19/排序算法/" data-id="cj43k3mco0002c0pm4lymaiz5" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/06/19/排序算法/" data-id="cje9nu0b90001n8pmzuatuimw" class="article-share-link">Share</a>
       
       
     </footer>
@@ -128,9 +128,9 @@
 
 
   
-    <article id="post-ES6 笔记" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-基础知识" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2016/12/23/ES6 笔记/" class="article-date">
+    <a href="/2016/12/23/基础知识/" class="article-date">
   <time datetime="2016-12-23T09:18:09.462Z" itemprop="datePublished">2016-12-23</time>
 </a>
     
@@ -142,7 +142,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/12/23/ES6 笔记/">ECMAScript6 笔记</a>
+      <a class="article-title" href="/2016/12/23/基础知识/">基础知识 笔记</a>
     </h1>
   
 
@@ -150,46 +150,258 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="1-let-amp-const：声明变量-amp-常量"><a href="#1-let-amp-const：声明变量-amp-常量" class="headerlink" title="1. let &amp; const：声明变量 &amp; 常量"></a>1. let &amp; const：声明变量 &amp; 常量</h3><p>仅在块级作用域有效（弥补JS没有块级作用域的概念），不存在变量提升，会封闭作用域。</p>
-<h3 id="2-解构赋值："><a href="#2-解构赋值：" class="headerlink" title="2. 解构赋值："></a>2. 解构赋值：</h3><p>按照一定的模式，从对象或数组中提取到对应的值 （默认值为 undefined ,当值为 undefined 不生效）</p>
+        <p><a href="#1">类型判断</a> | <a href="#2">== 与 ===</a> | <a href="#3">作用域与作用域链</a> | <a href="#4">值传递和引用传递</a> | <a href="#5">内存回收 GC 与内存泄漏</a> | <a href="#6">const &amp; Object.freeze</a> | <a href="#7">原型继承 与 类式继承</a> | <a href="#8">nodeJs 热更新实现</a> | <a href="#9">DOM的级别</a> | <a href="#10">标准盒模型&amp;怪异盒模型</a> | <a href="#11">flexbox 与 grid</a> | <a href="#12">清除浮动</a> | <a href="#13">CommonJS/AMD/CMD/UMD/ES6</a> | <a href="#13">HTTP 缓存机制</a></p>
+<h3 id="类型判断"><a href="#类型判断" class="headerlink" title="类型判断"></a><h3 id="1">类型判断</h3></h3><ul>
+<li><strong><code>typeof</code></strong> 结果只会有五种类型 <code>Number / String / Object / Undefined / Function</code></li>
+<li><strong><code>instanceof</code></strong> 判断是否出现在原型链上</li>
+<li><strong><code>Object.prototype.toString.call</code></strong> 返回详细的类型 <code>[object Number]</code></li>
+</ul>
+<h3 id="与"><a href="#与" class="headerlink" title="== 与 ==="></a><h3 id="2">== 与 ===</h3></h3><ul>
+<li><strong><code>==</code></strong>  判断两个值是否相等<ol>
+<li>判断 typeof 结果值是否一致，如果不一致转2，否则转3</li>
+<li>将不一致的转化成一致，优先转化成 number,转3</li>
+<li>类型为引入类型，则判断引用的地址是否相等，否则直接判断值</li>
+</ol>
+</li>
+<li><strong><code>===</code></strong>  与 == 区别在于，对typeof判断结果值也严格要求一致<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">NaN != any</div><div class="line">undefined == null // if x is null and y is undefined, return true</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="作用域与作用域链-Scope-Scope-Chain"><a href="#作用域与作用域链-Scope-Scope-Chain" class="headerlink" title="作用域与作用域链(Scope/Scope Chain)"></a><h3 id="3">作用域与作用域链(Scope/Scope Chain)</h3></h3><ol>
+<li>javaScript 解析器在一开始执行时,会把变量的声明部分提到函数的顶部执行(预解析).</li>
+<li>全局变量的定义，会一层层的往外查找。如果找到则给该变量赋值，否则定义在 window 上</li>
+<li>函数执行时会根据变量的作用域链,先查找本函数内的局部变量,然后一层层往外查找,直到找到最外层<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">function outer () &#123;</div><div class="line">  var i = 10;</div><div class="line">  ?????????</div><div class="line">  function inner () &#123;</div><div class="line">    j = 100;</div><div class="line">    var k = 1000;</div><div class="line">    console.log(i + j +k); // 输出1110</div><div class="line">  &#125;</div><div class="line">  inner();</div><div class="line">  console.log(k); // error：&apos;k not define&apos;</div><div class="line">&#125;</div><div class="line">outer();</div><div class="line">console.log(j); // 100</div><div class="line"></div><div class="line">如果??????加上 var j = 200 会输出什么</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="值传递和引用传递"><a href="#值传递和引用传递" class="headerlink" title="值传递和引用传递"></a><h3 id="4">值传递和引用传递</h3></h3><p>JS 传参时。原始数据类型都是值传递，<br>引用数据类型则是引用传递（Object，Function，Array，Date）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">var a = 1;</div><div class="line">var b = &#123;key: &apos;old&apos;&#125;;</div><div class="line">var c= &#123;key: &apos;old&apos;&#125;;</div><div class="line">function test(a, b, c) &#123;</div><div class="line">  a = 2;</div><div class="line">  b = &#123;key: &apos;new&apos;&#125;;</div><div class="line">  c.key = &apos;new&apos;;</div><div class="line">&#125;</div><div class="line">test(a, b, c)</div><div class="line">console.log(a) // 1 值传递</div><div class="line">console.log(b.key) // old 引用传递，但是并没有改变引用值，而是改变引用地址</div><div class="line">console.log(c.key) // new 引用传递，改变了引用地址的值</div></pre></td></tr></table></figure></p>
+<h3 id="内存回收-GC-与内存泄漏"><a href="#内存回收-GC-与内存泄漏" class="headerlink" title="内存回收 GC 与内存泄漏"></a><h3 id="5">内存回收 GC 与内存泄漏</h3></h3><p>基础数据类型存在栈内存（读取速度快），引用数据类型存在堆内存（内存大）。<br>GC 会定期（周期性）找出那些不在继续使用的变量，然后释放其内存。</p>
 <ul>
-<li><p>数组解构： 两边必须都是数组，否则报错。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">let [x, y = 1, z] = [3] // x:3 y:1 z:undefined</div></pre></td></tr></table></figure>
-</li>
-<li><p>对象、字符串解构： 查找两边同名的属性，再赋值给对应变量  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">let &#123; x, y &#125; = &#123;x: &apos;1&apos;&#125; // &#123; x, y &#125; = &#123; x: x, y: y &#125; -&gt; x:1 y:undefined</div></pre></td></tr></table></figure>
-</li>
-<li><p>数值、布尔值解构： 先将右边的值转成对象再解构</p>
-</li>
-<li>函数参数解构： 按相同模式传入，正常赋值</li>
+<li>标记清除：变量进入某个环境时，标记为进入环境，离开环境时同样标记，继而清除其占用的内存</li>
+<li>引用计数：记录该块内存被引用的次数，当次数为 0 时，清除</li>
 </ul>
-<h3 id="3-字符串的扩展：可以识别双字符，例如：’𠮷’（超过-uFFFF）"><a href="#3-字符串的扩展：可以识别双字符，例如：’𠮷’（超过-uFFFF）" class="headerlink" title="3. 字符串的扩展：可以识别双字符，例如：’𠮷’（超过\uFFFF）"></a>3. 字符串的扩展：可以识别双字符，例如：’𠮷’（超过\uFFFF）</h3><ul>
-<li>Unicode表示法: 采用\u{xxxxx}代替原来的\uxxxx,</li>
-<li>codePointAt(index)/fromCodePoint(code): code编码与char互相转化。index为0时得到双字符(若有)</li>
-<li>for..of: 遍历字符串(类似for…in)      at:根据下标读取字符串(类似charAt)  exp:for(let x of str/arr)</li>
-<li>include/startsWith/endsWith(str,index): 包含str/以str开头/结尾            exp:”xx”.include/startsWith/endsWith(“xxx”,index)</li>
-<li>repeat: 字符串的重复   exp:”xy”.repeat(‘3’) //‘3’-&gt;3-&gt;”xyxyxy”</li>
-<li>padStart/padEnd(len.str): 前/后补全字符串  exp:”123”.padStart(6,”0”)  //“000123”</li>
-<li>字符串模版:  <code>(反引号) 将字符串包在</code>里,变量用${xxx}定义</li>
+<h3 id="const-amp-Object-freeze"><a href="#const-amp-Object-freeze" class="headerlink" title="const &amp; Object.freeze"></a><h3 id="6">const &amp; Object.freeze</h3></h3><ul>
+<li>const 声明引用类型时，只是规定该指针不可变</li>
+<li>Object.freeze 冻结对象，完全不可变</li>
 </ul>
-<p>4 数值的扩展:<br>          二进制/八进制前缀: 0b/0o(在严格模式下单独0开头会报错,不能代表八进制)<br>          Number API: parseInt/Float: 转化成int/float型数值(减少全局空间的函数)     isInteger: 是否整型数值(3与3.0都为整型)<br>                                isSafeInteger: 整型数值是否在(-2^53,2^53)之间(超出无法精确表示,not safe)<br>          Math API: trunc 去除小数部分  sign:判断符号(1/-1/0/-0/NAN)  …<br>          <strong>(ES7):指数函数   b</strong>=3 //b=b<em>b</em>b</p>
-<p>5 数组的扩展: 数组会将空字符串转化成’undefined’<br>          Array.from(xx): 将伪数组转化成数组(与[].slice.call一致)<br>          Array.of(x,y,z): 将一组值转化成数组<br>          [].copyWithin(target,start,end): 将数组自身替换 target 被替换坐标 start/end 开始/结束坐标   exp:[1,2,3].copyWithin(0,1,2)  //[2,2,3]<br>          [].find/findIndex: 找到满足规则的值/下标(相当于some方法返回值/下标)<br>          [].fill(item,start,end): 将数组中的项替换成item<br>          [].keys/values/entries: 数组的键/值/键值对<br>          数组推导(ES7): 在数组中设定对应的规则,得到新的数组. var a1=[1,2,3,4];var a2=[for(i of a1)if(i&gt;2) i*2]; //a2:[6, 8]</p>
-<p>6 函数的扩展: length属性代表函数的没有默认值的入参个数(rest参数也不算)<br>          设置入参的默认值: 可以与解构赋值结合(有默认值的参数最好放后面),作用域默认是先找函数内部以及默认参数,然后才是函数外<br>          rest参数: 将若干个参数序列转化成数组values,rest参数后不能有其他正常参数    exp:function xx(…values){}  xx(1,2,3)<br>          …运算符: 将数组转化成若干个项(与rest相反),可将字符串和实现Iterator的对象转化成数组Map exp:var b=[1,…[2,3]]; //b:[1,2,3]<br>          name :函数的名字,构造函数返回”anonymous” 通过bind得到的函数前缀加”bound”<br>          箭头函数=&gt;: 简化函数体,箭头函数的this指向定义该this的函数,而非引用  exp:var t=(x,y)=&gt;x+2-y;  t(1,2)//1<br>          尾递归优化: 尾递归就是当返回值是个函数(尾调用)调用自身 优化方法:将中间的变量转化变成函数的参数(减少运行的次数)</p>
-<p>7 对象的扩展:<br>          属性和方法的简写: 属性简写允许只写属性名,默认的属性值为与属性名一致的变量代表的值   exp:var x=1,a={x} // a={x:1}<br>                                        方法简写允许省略function:      exp: var obj={hello(){…}} 等价于 obj{hello:function(){…}}<br>          对象定义方式: 可用中括号的形式,并且可以进行运算  exp: var obj={[‘a’+’bc’]:’test’}  //obj.[‘abc’]=’test’<br>          name: 对象(属性)的名字,构造函数返回”anonymous” 通过bind得到的对象(属性)前缀加”bound”<br>          Object.is: 与”===”类似,添加了+0与-0不等,NaN与自身相等<br>          Object.assign: 合并多个object,后面会覆盖前面的属性,若为一个对象,则只是得到引用<br>          对象的可枚举性(enumerable): 当某个属性的enumerable为false时,采用for..in就无法遍历到该属性,还是能正常使用(相当于秘密属性)<br>                                                           for…in会遍历到继承的属性,Object.keys只会得到自身的属性<br>          <strong>proto</strong>属性代替: Object.setPrototypeOf/getPrototypeOf 设置/获取当前的<strong>proto</strong>对象</p>
-<p>8 Symbol: 原始数据类型(防止属性名的冲突)<br>          特性: 独一无二的值.属于原始数据类型因此不能添加属性.  exp: let sym = Symbol(xxx); //xxx只是一个描述<br>                  作为属性时,只能用[]的赋/取值方式或者Object.defineProperty(obj,sym,{value:’xxx’})<br>          获取symbol属性: 可以通过Object.getOwnPropertySymbols获取所有的symbol属性,for..in/of都无法取到symbol属性<br>          Symbol.for/keyfor: Symbol.for(key)在创建Symbol之前会在全局变量中查找是否含有相同的key.如果不存在,才新建一个Symbol.<br>                                          而Symbol()每次都去创建一个Symbol.<br>                                          Symbol.keyFor(sym):获取Symbol的key</p>
-<p>9 Proxy和reflect:<br>          Proxy:代理,在对象执行某些操作之前拦截,添加自己的逻辑。new Proxy(target,handler),target为目标对象,handler为拦截后具体的<br>                    操作.添加代理后,必须对代理对象进行操作才能触发拦截(有些操作对原对象操作也会)<br>                    get: 当获取某个对象的属性时触发(proxy.key)<br>                    set: 当对象的某个属性进行赋值的时候触发(proxy.key=’xxx’)<br>                    apply: 当对象方法被调用/apply/call函数调用时生效(proxy()/proxy.apply(null,xxx))<br>                    has: 当使用in对象时生效(“xxx” in proxy)<br>                    construct :当new代理对象时生效(new proxy())<br>                    deleteProperty :当delete对象属性时生效,返回false则阻止删除操作(delete proxy.xxx)<br>                    emunerate: 当执行for..in的时候被拦截(for xxx in proxy)<br>                    get/setPrototypeOf: 当执行原型操作时触发(proxy instanceOf xxx)<br>          Proxy.revocable: 返回一个可取消的Proxy对象(proxy,invoke),其中proxy为代理对象,invoke为一个函数,用来取消proxy对象<br>          Reflect: 1 将Object上的一些方法明显属于内部的方法放到Reflect上<br>                       2 Proxy上的方法Reflect一样拥有。<br>                       3 将一些命令式的操作变成函数行为. exp: delete obj.xxx 变成 Reflect.deleteProperty(obj,xxx)</p>
-<p>10 二进制数组: 以字节为单位,主要为了以二进制与底层硬件交互(如显卡),提高效率<br>          ArrayBuffer 二进制数组      TypedArray 简单视图(单类型)    DataView 复杂视图(可定义多种类型)</p>
-<p>11 Set和Map:<br>          Set: 与Array类似,但内部的成员是不会重复(唯一),并且set的内部不会进行类型的转换,<br>                 keys/values: 遍历set(得到的结果一样)  size属性: set的元素个数<br>          WeakSet: 与Set相比有两点差异 1 元素必须都是Object  2 内部的元素,若失去其他引用则自动被回收<br>          Map: 与Object类似,但key可以是一个对象<br>          WeakMap: 与Map相比有两点差异 1 key必须是Object  2 内部的元素,若失去其他引用则自动被回收</p>
-<p>12 Iterator:  遍历器(array/set/map/字符串&lt;理解成字符数组&gt;默认实现了Iterator接口)<br>          作用: 1 为各种数据结构提供了统一的访问接口<br>                   2 数据结构的成员能按某种顺序排列<br>                   3 提供了新的遍历方式for…of…(可以结合return/break使用)<br>                   伪数组或者类似数组的对象要实现Iterator接口,只需设置 obj[Symbol.iterator]= Array.prototype[Symbol.iterator]<br>                   调用 arr<a href="">Symbol.iterator</a> 可以得到一个遍历器对象,可以使用next()遍历,类似指针</p>
-<p>13 Generator函数: 是一种异步编程的解决方案,封装了多个内部状态(yield),返回一个遍历器对象(es7：async await)<br>          特点: 函数内部状态yield,只有当next()调用到,才会执行<br>          yield: 相当于函数暂停执行的标记,调用next()继续执行,yield后的表达式不会立即求值,只有当被next调用才求值(函数记忆)<br>                    next执行传递的参数相当于上一次yield返回的结果,<br>          Generator.prototype.throw: 遍历器throw异常(参数),可在函数体外throw,函数体内catch到. exp:var f=Generator(); f.throw(‘a’);<br>          Generator.prototype.return: 结束当前generator中的yield,若有try..finally.则等到finally执行完毕再return<br>          yield*: 后面跟随一个实现Iterator接口的对象,代表对该对象执行(for xxx of 对象){yield xxx}<br>                    generator返回的遍历器对象是Generator的实例,可以访问到(Generator.prototype的属性,但是访问不到generator构造方法)<br>         用途: 可以用于控制函数执行顺序的控制,同步的控制。</p>
-<p>14 Promise函数: 异步编程的一种解决方案,与jQuery的promise有点类似<br>          实例化: 创建一个promise对象 new Promise(function(resolve,reject))<br>          then/catch/finally/done: 状态为resolve/reject/运行完毕/出现异常触发<br>          Promise.all: 传个多个promise(若不是则通过Promise.resolve转化),返回一个promise对象,<br>                              当全部为resolve(返回全部data)/有一个为reject(返回reject的data)执行<br>          Promise.race: 传入多个promise,当有promise状态发生改变的时候触发<br>          Promise.resolve/reject: 返回一个状态为resolve/reject的promise对象<br>                              1 当参数为promise对象时,返回promise该对象<br>                              2 当参数为非promise对象,并且还有then方法时,返回promise对象,并且执行该对象then方法<br>                              3 当参数为非上述对象或者不是对象,返回一个promise对象,并且执行该promise对象的then方法,参数为上述对象<br>                              4 没有参数时,返回一个promise对象,</p>
-<p>15 thunkify、Co模块:<br>          thunk函数: 将多参数的函数转化只接受回调函数的参数,实际上是将参数和回调函数分开调用<br>          thunkify模块: 传入一个正常的异步函数(有回调 exp:readFile),返回一个thunk函数<br>                                 用于generator函数的自动调用,前提yield后面必须是thunk函数<br>          co模块: 用于generator函数的自动调用,前提yield后面必须是thunk函数/Promise对象,接受一个generator函数,返回一个promise对象</p>
-<p>16 class: 类 实际上是function的语法糖<br>          写法: 用class关键字定义一个类,类内部定义的方法实际上是定义在类的原型上,不会变量提升,方法补不可枚举<br>          new/constructor: new实例化一个类,默认去调用constructor方法<br>          extends: 1  继承 默认实现父类的constructor方法,要使用this,必须实现父类的constructor(super), (ES5先建立子类的实例,再将父类的方法<br>                             加入,而ES6是先实例化父类,然后构造子类)<br>                         2  A extends B :  A.<strong>proto</strong> === B / A.prototype.<strong>proto</strong> === B.protototype<br>                         3  利用extends可以修改原生的数据类型<br>          get/set方法:  定义: get type(){}/set type(value){}    使用: XXX.type/XXX.type=’xxx’<br>          静态方法: ES6没有静态属性,只有静态方法(static). 对于属性,可以通过类定义,不能在内部定义</p>
+<h3 id="原型继承-与-类式继承"><a href="#原型继承-与-类式继承" class="headerlink" title="原型继承 与 类式继承"></a><h3 id="7">原型继承 与 类式继承</h3></h3><ul>
+<li><p>原型继承：将被继承的对象放到该对象的原型链上</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">var A = function()&#123;</div><div class="line">    this.x = &apos;ax&apos;</div><div class="line">&#125;</div><div class="line">var B = function()&#123;&#125;</div><div class="line">// 适用于B已经定义完成的继承</div><div class="line">B.prototype = new A()</div><div class="line">var b = new B()</div><div class="line">alert(b.x) // ax</div></pre></td></tr></table></figure>
+</li>
+<li><p>类式继承</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">var A = function()&#123;</div><div class="line">    this.x = &apos;ax&apos;</div><div class="line">&#125;</div><div class="line">var B = function()&#123;</div><div class="line">    A.call(this)</div><div class="line">&#125;</div><div class="line">var b = new B()</div><div class="line">alert(b.x) // ax</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="nodeJs-热更新实现"><a href="#nodeJs-热更新实现" class="headerlink" title="nodeJs 热更新实现"></a><h3 id="8">nodeJs 热更新实现</h3></h3><blockquote>
+<p>module._load 默认去找 module._cache,因此删除 require.cache(xx) 即可实现</p>
+</blockquote>
+<h3 id="DOM的级别"><a href="#DOM的级别" class="headerlink" title="DOM的级别"></a><h3 id="9">DOM的级别</h3></h3><ul>
+<li>DOM1级 主要规定了如何映射XML文档结构以及扩展了 HTML 的对象和方法</li>
+<li>DOM2级 增加了下列新模块 DOM视图/事件(addEventListener)/样式/遍历</li>
+<li>DOM3级 扩展了DOM的加载和保存/验证等</li>
+</ul>
+<p>所谓DOM0级只是代表DOM未形成标准前的一个参照点</p>
+<h5 id="DOM0级与DOM2级事件"><a href="#DOM0级与DOM2级事件" class="headerlink" title="DOM0级与DOM2级事件"></a>DOM0级与DOM2级事件</h5><p>绑定事件： <code>&lt;.. onclick /&gt;    xxx.onclick=...    xxx.addEventListener...</code></p>
+<ul>
+<li>0级事件：使用DOM的默认事件机制，监听属性，事件会互相覆盖</li>
+<li>2级事件：增加了处理事件的方法(addEventListener)，事件不会覆盖</li>
+</ul>
+<h3 id="标准盒模型-amp-怪异盒模型"><a href="#标准盒模型-amp-怪异盒模型" class="headerlink" title="标准盒模型&amp;怪异盒模型"></a><h3 id="10">标准盒模型&amp;怪异盒模型</h3></h3><ul>
+<li>标准盒模型： width = content</li>
+<li>怪异盒模型： width = padding + border + content 当总宽度固定时可采用</li>
+</ul>
+<p>通过 box-sizing 切换 border-box/content-box</p>
+<h3 id="flexbox-与-grid"><a href="#flexbox-与-grid" class="headerlink" title="flexbox 与 grid"></a><h3 id="11">flexbox 与 grid</h3></h3><ul>
+<li>flexbox提供一个灵活可自动调整的布局方式</li>
+</ul>
+<p>flexbox需要在外层容器设置display:flex，内层的Item才能生效</p>
+<h5 id="Flex-属性说明"><a href="#Flex-属性说明" class="headerlink" title="Flex 属性说明"></a>Flex 属性说明</h5><table>
+<thead>
+<tr>
+<th>属性</th>
+<th>说明</th>
+<th>取值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>flex-direction</td>
+<td>item 的排列方向</td>
+<td>row/row-reverse/column…</td>
+</tr>
+<tr>
+<td>flex-wrap</td>
+<td>item 的换行策略</td>
+<td>wrap/nowrap</td>
+</tr>
+<tr>
+<td>flex-flow</td>
+<td>flex-direction与flex-wrap的合并简写</td>
+</tr>
+<tr>
+<td>justify-content</td>
+<td>主轴的方向</td>
+<td>flex-start/flex-end/center/space-between/space-around</td>
+</tr>
+<tr>
+<td>align-items</td>
+<td>交叉轴的对齐方向</td>
+<td>flex-start/flex-end/center/stretch</td>
+</tr>
+<tr>
+<td>aligin-content</td>
+<td>多根轴线的对齐方式</td>
+</tr>
+</tbody>
+</table>
+<h5 id="Item-属性说明"><a href="#Item-属性说明" class="headerlink" title="Item 属性说明"></a>Item 属性说明</h5><table>
+<thead>
+<tr>
+<th>属性</th>
+<th>说明</th>
+<th>取值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>order</td>
+<td>item排序,从小到大</td>
+<td>int</td>
+</tr>
+<tr>
+<td>flex</td>
+<td>缩小放大未来大小属性集合，一般只写flex-grow</td>
+<td>int</td>
+</tr>
+<tr>
+<td>align-self</td>
+<td>对齐方式,会覆盖align-items</td>
+<td>同align-items</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>grid是一个基于二维网格布局的系统</li>
+</ul>
+<p>grid布局需要外层容器定义display:grid</p>
+<h5 id="Grid-属性说明"><a href="#Grid-属性说明" class="headerlink" title="Grid 属性说明"></a>Grid 属性说明</h5><table>
+<thead>
+<tr>
+<th>属性</th>
+<th>说明</th>
+<th>取值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>grid-template-columns/rows</td>
+<td>各列/行的大小</td>
+<td>length length …</td>
+</tr>
+<tr>
+<td>grid-gap(grid-column/row-gap)</td>
+<td>各列/行的间距</td>
+<td>length</td>
+</tr>
+<tr>
+<td>justify-items/align-items</td>
+<td>沿列轴/行轴对齐方式</td>
+<td>start/end/center/stretch</td>
+</tr>
+<tr>
+<td>justify-content/align-content</td>
+<td>外层容器的对齐方式</td>
+<td>…</td>
+</tr>
+<tr>
+<td>grid-auto-columns/rows</td>
+<td>grid之外的隐式网格大小</td>
+</tr>
+<tr>
+<td>grid-auto-flow</td>
+<td>自动排列的方向</td>
+<td>row(dense)/column(dense)</td>
+</tr>
+</tbody>
+</table>
+<h5 id="Item-属性说明-1"><a href="#Item-属性说明-1" class="headerlink" title="Item 属性说明"></a>Item 属性说明</h5><table>
+<thead>
+<tr>
+<th>属性</th>
+<th>说明</th>
+<th>取值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>grid-column/row-start/end</td>
+<td>item的覆盖行列起止</td>
+<td>int</td>
+</tr>
+<tr>
+<td>grid-column/row</td>
+<td>item的行列位置</td>
+<td>int</td>
+</tr>
+</tbody>
+</table>
+<p>justify-self/align-self|行列的对齐方式，覆盖父级|</p>
+<h3 id="清除浮动"><a href="#清除浮动" class="headerlink" title="清除浮动"></a><h3 id="12">清除浮动</h3></h3><p>问题：浮动的存在会导致父元素的高度崩塌</p>
+<p>清除浮动的方法（ps: clear只作用于被定义的元素本身，BFC 块级排版上下文）</p>
+<ol>
+<li>父元素加 overflow:hidden/auto             =&gt;  会被隐藏或者出来滚动条</li>
+</ol>
+<p><strong>原理：设置 overflow:hidden，该元素与子元素都会在同个独立的块级上下文上</strong></p>
+<ol>
+<li>父元素加伪类 :after 和 zoom（兼容IE6/7）clear: both  =&gt;  推荐使用</li>
+<li>结尾加空标签并加上 clear: both            =&gt;  增加DOM结构</li>
+</ol>
+<p><strong>原理：空标签/伪类加上clear: both，会出现在浮动元素的下方，外层容器也就被撑开</strong></p>
+<h3 id="CommonJS-AMD-CMD-UMD-ES6"><a href="#CommonJS-AMD-CMD-UMD-ES6" class="headerlink" title="CommonJS/AMD/CMD/UMD/ES6"></a><h3 id="13">CommonJS/AMD/CMD/UMD/ES6</h3></h3><ul>
+<li><p>CommonJS：适用于服务端的规范。CommonJS 规定一个文件就是一个模块，当执行 require 时会执行对应文件的内容，由于文件存储在硬盘，因此读取速度比较快。比较适用于同步的执行方式，所以不适合浏览器环境。</p>
+<p><strong><code>require()</code> 用来引入外部模块</strong><br><strong><code>exports</code> 对象用于导出当前模块的方法或变量，唯一的导出口</strong><br><strong><code>module</code> 对象就代表模块本身。</strong></p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">var clock = require(&apos;clock&apos;)</div></pre></td></tr></table></figure>
+<ul>
+<li><p>AMD：异步加载模块，适用于define方法定义模块，前置依赖（requirejs）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">// define(id?, dependencies?, factory)</div><div class="line">define([&apos;module1&apos;, &apos;module2&apos;], function(module1, module2) &#123;</div><div class="line">    // do something</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+</li>
+<li><p>CMD：与AMD类似，就近依赖（seajs）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">define(function(require, exports, module) &#123;</div><div class="line">    var a = require(&apos;a&apos;)</div><div class="line">    a.test()</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+</li>
+<li><p>UMD：CMD 与 AMD 的结合，UMD 先判断是否支持 Node.js 的模块（exports）是否存在，存在则使用 Node.js 模块模式。<br>在判断是否支持 AMD（define是否存在），存在则使用 AMD 方式加载模块</p>
+</li>
+<li><p>ES6： 上述方法载入模块都为运行时加载，而ES6为编译时加载，不会载入不用的代码</p>
+</li>
+</ul>
+<h3 id="HTTP-缓存机制"><a href="#HTTP-缓存机制" class="headerlink" title="HTTP 缓存机制"></a><h3 id="14">HTTP 缓存机制</h3></h3><blockquote>
+<p>HTTP 缓存分成强制缓存和协商缓存两种,通过HTTP的Header来控制缓存行为</p>
+<ul>
+<li>强制缓存：发起请求， 当命中该缓存且不失效，直接返回该结果。当浏览器未命中该缓存，则去服务端获取该资源，返回结果，并且加到缓存中。<br>强制缓存通过 Header 中的 Expires 和 Cache-Control 来控制</li>
+</ul>
+</blockquote>
+<pre><code>- Expires的值为服务端返回的资源的过期时间，改字段为 Http1.0 的内容，服务端时间与客户端可能存在误差，因此逐渐被Cache-Control替代
+- Cache-Control的取值有`private、public、no-cache、no-store、max-age`
+
+    - private：客户端可以缓存
+    - public：客户端和服务端都可以缓存
+    - no-store：客户端和服务端都不缓存
+    - max-age=XXX：与Expires类似，单位是秒，代表XXX秒后失效
+    - ==no-cache：采用协商缓存==
+</code></pre><ul>
+<li><p>协商缓存：发起请求，当命中该缓存，获得该缓存的标识符，去服务端验证是否有效，有效则直接使用该缓存，否则请求服务端。未命中也一样请求服务端。<br>协商缓存通过 Last-Modified / If-Modified-Since 或者 Etag / If-None-Match（优先级高）</p>
+<ul>
+<li><p>Last-Modified / If-Modified-Since：Response Header 返回 Last-Modified 表示该资源最近修改的时间，Request Header上的 If-Modified-Since 表示本地缓存的该资源的时间，如果 Last-Modified &lt; If-Modified-Since的话,则使用本地的缓存</p>
+</li>
+<li><p>Etag / If-None-Match：Etag表示最近修改资源的标识符，If-None-Match表示最近一次获取到的资源的标识符，判断两者相等的话就使用本地缓存</p>
+</li>
+</ul>
+</li>
+</ul>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/12/23/ES6 笔记/" data-id="cj43k3mcd0001c0pmlsiiw78u" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/12/23/基础知识/" data-id="cje9nu0b50000n8pmiscnp562" class="article-share-link">Share</a>
       
       
     </footer>
@@ -202,7 +414,7 @@
     <article id="post-JS 笔记" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/12/08/JS 笔记/" class="article-date">
-  <time datetime="2016-12-08T09:02:55.761Z" itemprop="datePublished">2016-12-08</time>
+  <time datetime="2016-12-08T09:02:55.762Z" itemprop="datePublished">2016-12-08</time>
 </a>
     
   </div>
@@ -308,7 +520,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/12/08/JS 笔记/" data-id="cj43k3mc90000c0pmu42up11v" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/12/08/JS 笔记/" data-id="cje9nu0bl0002n8pmw9xgglze" class="article-share-link">Share</a>
       
       
     </footer>
@@ -352,7 +564,7 @@
           </li>
         
           <li>
-            <a href="/2016/12/23/ES6 笔记/">ECMAScript6 笔记</a>
+            <a href="/2016/12/23/基础知识/">基础知识 笔记</a>
           </li>
         
           <li>
@@ -371,7 +583,7 @@
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2017 YR lei<br>
+      &copy; 2018 YR lei<br>
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
