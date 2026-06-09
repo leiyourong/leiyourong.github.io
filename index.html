@@ -1,511 +1,1308 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <meta charset="utf-8">
-  
-  <title>luckyLL</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #000;
-      color: #fff;
-      font-family: -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
-    }
-    #fireworks-root {
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle at bottom, #001020 0, #000 50%, #000 100%);
-    }
-    #fireworksCanvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-    #controls {
-      position: absolute;
-      left: 50%;
-      bottom: 6vh;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 16px;
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.55);
-      box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(10px);
-    }
-    #textInput {
-      min-width: 220px;
-      max-width: 320px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      background: rgba(0, 0, 0, 0.4);
-      color: #fff;
-      outline: none;
-    }
-    #textInput::placeholder {
-      color: rgba(255, 255, 255, 0.55);
-    }
-    #launchButton {
-      padding: 0;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.25);
-      background: radial-gradient(circle at 30% 30%, #ffe082, #ff7043 60%, #7c4dff 100%);
-      color: #fff;
-      cursor: pointer;
-      letter-spacing: 1px;
-      width: 42px;
-      height: 42px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.4), inset 0 0 12px rgba(255,255,255,0.3);
-    }
-    #launchButton:active {
-      transform: translateY(1px);
-      box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
-    }
-    #settings {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      z-index: 10;
-    }
-    #settingsToggle {
-      width: 40px;
-      height: 40px;
-      border-radius: 999px;
-      border: none;
-      background: rgba(255,255,255,0.12);
-      color: #fff;
-      cursor: pointer;
-      font-size: 18px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(6px);
-    }
-    #settingsPanel {
-      position: absolute;
-      top: 52px;
-      right: 0;
-      min-width: 280px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      background: rgba(0,0,0,0.7);
-      color: #fff;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      backdrop-filter: blur(10px);
-      display: none;
-    }
-    #settingsPanel h4 {
-      font-size: 14px;
-      margin: 6px 0 8px;
-      font-weight: 600;
-      color: #fff;
-    }
-    .row {
-      margin-bottom: 10px;
-    }
-    .palette {
-      display: grid;
-      grid-template-columns: repeat(5, 26px);
-      gap: 8px;
-    }
-    .chip {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.25);
-      cursor: pointer;
-    }
-    .chip.selected {
-      border-color: #fff;
-      box-shadow: 0 0 0 2px rgba(255,255,255,0.2);
-    }
-    .shape-group {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-    .shape-group label {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      font-size: 13px;
-    }
-    .speed-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    #speedRange {
-      width: 160px;
-    }
-    #speedLabel {
-      font-size: 12px;
-      color: #ddd;
-      min-width: 40px;
-      text-align: right;
-    }
-  </style>
-  
-    
-</head>
+  <head>
+    <meta charset="utf-8" />
 
-<body>
-  <div id="fireworks-root">
-    <canvas id="fireworksCanvas"></canvas>
-    <div id="controls">
-      <input id="textInput" type="text" maxlength="12" placeholder="输入名字，按回车或点发射">
-      <button id="launchButton" title="发射烟花">🚀</button>
-    </div>
-    <div id="settings">
-      <button id="settingsToggle" title="设置">⚙️</button>
-      <div id="settingsPanel">
-        <div class="row">
-          <h4>速度</h4>
-          <div class="speed-row">
-            <input id="speedRange" type="range" min="50" max="200" value="100">
-            <span id="speedLabel">x1.00</span>
+    <title>luckyLL</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+        color: #fff;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      }
+      #fireworks-root {
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(
+          circle at bottom,
+          #001020 0,
+          #000 50%,
+          #000 100%
+        );
+      }
+      #fireworksCanvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      #controls {
+        position: absolute;
+        left: 50%;
+        bottom: 6vh;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.55);
+        box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+      }
+      #textInput {
+        min-width: 220px;
+        max-width: 320px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.4);
+        color: #fff;
+        outline: none;
+      }
+      #textInput::placeholder {
+        color: rgba(255, 255, 255, 0.55);
+      }
+      #launchButton {
+        padding: 0;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        background: radial-gradient(
+          circle at 30% 30%,
+          #ffe082,
+          #ff7043 60%,
+          #7c4dff 100%
+        );
+        color: #fff;
+        cursor: pointer;
+        letter-spacing: 1px;
+        width: 42px;
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        box-shadow:
+          0 6px 16px rgba(0, 0, 0, 0.4),
+          inset 0 0 12px rgba(255, 255, 255, 0.3);
+      }
+      #launchButton:active {
+        transform: translateY(1px);
+        box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
+      }
+      #settings {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        z-index: 10;
+      }
+      #settingsToggle {
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        border: none;
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+        cursor: pointer;
+        font-size: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(6px);
+      }
+      #settingsPanel {
+        position: absolute;
+        top: 52px;
+        right: 0;
+        min-width: 280px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(10px);
+        display: none;
+      }
+      #settingsPanel h4 {
+        font-size: 14px;
+        margin: 6px 0 8px;
+        font-weight: 600;
+        color: #fff;
+      }
+      .row {
+        margin-bottom: 10px;
+      }
+      .palette {
+        display: grid;
+        grid-template-columns: repeat(5, 26px);
+        gap: 8px;
+      }
+      .chip {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.25);
+        cursor: pointer;
+      }
+      .chip.selected {
+        border-color: #fff;
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+      }
+      .shape-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 12px;
+        align-items: center;
+      }
+      .shape-group label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        font-size: 13px;
+      }
+      .speed-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      #speedRange {
+        width: 160px;
+      }
+      #speedLabel {
+        font-size: 12px;
+        color: #ddd;
+        min-width: 40px;
+        text-align: right;
+      }
+      #pageTitle {
+        position: fixed;
+        top: 5vh;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 20;
+        font-size: clamp(22px, 5vw, 42px);
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        white-space: nowrap;
+        pointer-events: none;
+        background: linear-gradient(
+          90deg,
+          #ff6ec7,
+          #ffd54f,
+          #4fc3f7,
+          #ba68c8,
+          #ff6ec7
+        );
+        background-size: 300% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation:
+          titleShine 4s linear infinite,
+          titleFloat 3s ease-in-out infinite;
+        filter: drop-shadow(0 0 12px rgba(255, 110, 199, 0.55))
+          drop-shadow(0 0 28px rgba(79, 195, 247, 0.35));
+      }
+      @keyframes titleShine {
+        0% {
+          background-position: 0% 50%;
+        }
+        100% {
+          background-position: 300% 50%;
+        }
+      }
+      @keyframes titleFloat {
+        0%,
+        100% {
+          transform: translateX(-50%) translateY(0);
+        }
+        50% {
+          transform: translateX(-50%) translateY(-6px);
+        }
+      }
+      #starsCanvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        z-index: 0;
+      }
+      #fireworksCanvas {
+        z-index: 1;
+        cursor: crosshair;
+      }
+      #aurora {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.45;
+        background:
+          radial-gradient(
+            ellipse 80% 40% at 20% 100%,
+            rgba(0, 255, 170, 0.18),
+            transparent 70%
+          ),
+          radial-gradient(
+            ellipse 70% 35% at 80% 100%,
+            rgba(120, 80, 255, 0.2),
+            transparent 70%
+          ),
+          radial-gradient(
+            ellipse 60% 30% at 50% 100%,
+            rgba(255, 100, 180, 0.12),
+            transparent 70%
+          );
+        animation: auroraShift 8s ease-in-out infinite alternate;
+      }
+      @keyframes auroraShift {
+        0% {
+          transform: translateY(0) scaleY(1);
+          filter: hue-rotate(0deg);
+        }
+        100% {
+          transform: translateY(-12px) scaleY(1.08);
+          filter: hue-rotate(35deg);
+        }
+      }
+      #hint {
+        position: fixed;
+        bottom: calc(6vh + 68px);
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 15;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.45);
+        letter-spacing: 0.08em;
+        pointer-events: none;
+        animation: hintPulse 2.5s ease-in-out infinite;
+      }
+      @keyframes hintPulse {
+        0%,
+        100% {
+          opacity: 0.35;
+        }
+        50% {
+          opacity: 0.75;
+        }
+      }
+      .chip-glow {
+        animation: chipPulse 2s ease-in-out infinite;
+      }
+      @keyframes chipPulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+        }
+        50% {
+          box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.35);
+        }
+      }
+      #moon {
+        position: fixed;
+        top: 6vh;
+        left: 8vw;
+        width: clamp(48px, 8vw, 72px);
+        height: clamp(48px, 8vw, 72px);
+        border-radius: 50%;
+        z-index: 12;
+        pointer-events: none;
+        background: radial-gradient(
+          circle at 35% 35%,
+          #fffef5 0%,
+          #f5f0d0 40%,
+          #e8dfc0 100%
+        );
+        box-shadow:
+          0 0 30px rgba(255, 250, 220, 0.5),
+          0 0 60px rgba(255, 240, 200, 0.25),
+          inset -8px -4px 12px rgba(200, 190, 160, 0.3);
+        animation: moonGlow 4s ease-in-out infinite alternate;
+      }
+      #moon::after {
+        content: "";
+        position: absolute;
+        top: -6%;
+        left: 22%;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: #000;
+        box-shadow: inset 12px 0 20px rgba(0, 0, 0, 0.9);
+      }
+      @keyframes moonGlow {
+        0% {
+          filter: brightness(1);
+        }
+        100% {
+          filter: brightness(1.12);
+        }
+      }
+      #launchButton {
+        animation: btnPulse 2.4s ease-in-out infinite;
+      }
+      @keyframes btnPulse {
+        0%,
+        100% {
+          box-shadow:
+            0 6px 16px rgba(0, 0, 0, 0.4),
+            inset 0 0 12px rgba(255, 255, 255, 0.3),
+            0 0 0 0 rgba(255, 112, 67, 0);
+        }
+        50% {
+          box-shadow:
+            0 6px 16px rgba(0, 0, 0, 0.4),
+            inset 0 0 12px rgba(255, 255, 255, 0.3),
+            0 0 18px 4px rgba(255, 112, 67, 0.45);
+        }
+      }
+      #toast {
+        position: fixed;
+        top: 18vh;
+        left: 50%;
+        transform: translateX(-50%) translateY(-12px);
+        z-index: 25;
+        padding: 8px 18px;
+        border-radius: 999px;
+        font-size: 13px;
+        letter-spacing: 0.06em;
+        color: rgba(255, 255, 255, 0.9);
+        background: rgba(0, 0, 0, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(8px);
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          opacity 0.4s ease,
+          transform 0.4s ease;
+      }
+      #toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="pageTitle">✦ 柚子专属页面 ✦</div>
+    <div id="moon"></div>
+    <div id="toast"></div>
+    <div id="hint">点击夜空发射烟花 · 双击超级彩蛋 · 空格键随机绽放</div>
+    <div id="fireworks-root">
+      <div id="aurora"></div>
+      <canvas id="starsCanvas"></canvas>
+      <canvas id="fireworksCanvas"></canvas>
+      <div id="controls">
+        <input
+          id="textInput"
+          type="text"
+          maxlength="12"
+          placeholder="输入名字，按回车或点发射"
+        />
+        <button id="launchButton" title="发射烟花">🚀</button>
+      </div>
+      <div id="settings">
+        <button id="settingsToggle" title="设置">⚙️</button>
+        <div id="settingsPanel">
+          <div class="row">
+            <h4>速度</h4>
+            <div class="speed-row">
+              <input
+                id="speedRange"
+                type="range"
+                min="50"
+                max="200"
+                value="100"
+              />
+              <span id="speedLabel">x1.00</span>
+            </div>
           </div>
-        </div>
-        <div class="row">
-          <h4>颜色（多选）</h4>
-          <div class="palette" id="colorPalette">
-            <div class="chip selected" data-color="#ffd54f" style="background:#ffd54f"></div>
-            <div class="chip selected" data-color="#ffb74d" style="background:#ffb74d"></div>
-            <div class="chip selected" data-color="#ff8a65" style="background:#ff8a65"></div>
-            <div class="chip selected" data-color="#4fc3f7" style="background:#4fc3f7"></div>
-            <div class="chip selected" data-color="#81c784" style="background:#81c784"></div>
-            <div class="chip selected" data-color="#ba68c8" style="background:#ba68c8"></div>
-            <div class="chip selected" data-color="#fff176" style="background:#fff176"></div>
-            <div class="chip selected" data-color="#f06292" style="background:#f06292"></div>
-            <div class="chip selected" data-color="#64b5f6" style="background:#64b5f6"></div>
-            <div class="chip selected" data-color="#a5d6a7" style="background:#a5d6a7"></div>
+          <div class="row">
+            <h4>颜色（多选）</h4>
+            <div class="palette" id="colorPalette">
+              <div
+                class="chip selected"
+                data-color="#ffd54f"
+                style="background: #ffd54f"
+              ></div>
+              <div
+                class="chip selected"
+                data-color="#ffb74d"
+                style="background: #ffb74d"
+              ></div>
+              <div
+                class="chip selected"
+                data-color="#ff8a65"
+                style="background: #ff8a65"
+              ></div>
+              <div
+                class="chip selected"
+                data-color="#4fc3f7"
+                style="background: #4fc3f7"
+              ></div>
+              <div
+                class="chip selected"
+                data-color="#81c784"
+                style="background: #81c784"
+              ></div>
+              <div
+                class="chip selected"
+                data-color="#ba68c8"
+                style="background: #ba68c8"
+              ></div>
+              <div
+                class="chip selected"
+                data-color="#fff176"
+                style="background: #fff176"
+              ></div>
+              <div
+                class="chip selected"
+                data-color="#f06292"
+                style="background: #f06292"
+              ></div>
+              <div
+                class="chip selected"
+                data-color="#64b5f6"
+                style="background: #64b5f6"
+              ></div>
+              <div
+                class="chip selected"
+                data-color="#a5d6a7"
+                style="background: #a5d6a7"
+              ></div>
+            </div>
           </div>
-        </div>
-        <div class="row">
-          <h4>烟花形式</h4>
-          <div class="shape-group">
-            <label><input type="radio" name="shape" value="circle" checked> 圆形</label>
-            <label><input type="radio" name="shape" value="heart"> 爱心</label>
+          <div class="row">
+            <h4>烟花形式</h4>
+            <div class="shape-group">
+              <label
+                ><input type="radio" name="shape" value="circle" checked />
+                圆形</label
+              >
+              <label
+                ><input type="radio" name="shape" value="heart" /> 爱心</label
+              >
+              <label
+                ><input type="radio" name="shape" value="star" /> 星形</label
+              >
+              <label
+                ><input type="radio" name="shape" value="ring" /> 光环</label
+              >
+              <label
+                ><input type="radio" name="shape" value="butterfly" />
+                蝴蝶</label
+              >
+            </div>
+          </div>
+          <div class="row">
+            <h4>氛围</h4>
+            <div class="shape-group">
+              <label
+                ><input type="checkbox" id="constellationToggle" checked />
+                星座连线</label
+              >
+              <label
+                ><input type="checkbox" id="ambientToggle" checked />
+                漂浮光点</label
+              >
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <script>
-  (function() {
-    var canvas = document.getElementById("fireworksCanvas");
-    if (!canvas) return;
-    var ctx = canvas.getContext("2d");
-    var dpr = window.devicePixelRatio || 1;
-    var fireworks = [];
-    var particles = [];
-    var textParticles = [];
-    var lastLaunch = 0;
-    var config = {
-      speed: 1.0,
-      palette: ["#ffd54f","#ffb74d","#ff8a65","#4fc3f7","#81c784","#ba68c8","#fff176","#f06292","#64b5f6","#a5d6a7"],
-      selectedColors: null,
-      shape: "circle"
-    };
-    function rnd() { return Math.random(); }
-    function now() { return (window.performance && performance.now) ? performance.now() : Date.now(); }
-    function resize() {
-      var w = window.innerWidth;
-      var h = window.innerHeight;
-      canvas.style.width = w + "px";
-      canvas.style.height = h + "px";
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-    function randomColor() {
-      var base = (config.selectedColors && config.selectedColors.length) ? config.selectedColors : config.palette;
-      return base[(base.length * rnd()) | 0];
-    }
-    function spawnFirework() {
-      var w = canvas.width / dpr;
-      var h = canvas.height / dpr;
-      fireworks.push({
-        x: w * (0.1 + 0.8 * rnd()),
-        y: h + 10,
-        targetY: h * (0.2 + 0.3 * rnd()),
-        speed: (4 + 2 * rnd()) * config.speed,
-        color: randomColor(),
-        exploded: false
-      });
-    }
-    function explode(fw) {
-      var count, baseSpeed;
-      if (config.shape === "heart") {
-        count = 180;
-        baseSpeed = 0.5 * config.speed;
-        var minDim = Math.min(canvas.width / dpr, canvas.height / dpr);
-        var scale = Math.max(2.0, Math.min(3.6, minDim / 180));
-        for (var i = 0; i < count; i++) {
-          var t = (Math.PI * 2 * i) / count;
-          var hx = Math.pow(Math.sin(t), 3);
-          var hy = 0.8125 * Math.cos(t) - 0.3125 * Math.cos(2 * t) - 0.125 * Math.cos(3 * t) - 0.0625 * Math.cos(4 * t);
-          var dx = hx * scale;
-          var dy = -hy * scale;
-          var jitter = 0.15;
-          var vx = dx * (1.2 + rnd() * 0.3) + (rnd() - 0.5) * jitter;
-          var vy = dy * (1.2 + rnd() * 0.3) + (rnd() - 0.5) * jitter;
-          particles.push({
-            x: fw.x,
-            y: fw.targetY,
-            vx: vx * baseSpeed,
-            vy: vy * baseSpeed,
-            alpha: 1,
-            color: fw.color,
-            life: 120 + (rnd() * 60) | 0
+    <script>
+      (function () {
+        var canvas = document.getElementById("fireworksCanvas");
+        var starsCanvas = document.getElementById("starsCanvas");
+        if (!canvas || !starsCanvas) return;
+        var ctx = canvas.getContext("2d");
+        var starsCtx = starsCanvas.getContext("2d");
+        var dpr = window.devicePixelRatio || 1;
+        var fireworks = [];
+        var particles = [];
+        var textParticles = [];
+        var mouseTrails = [];
+        var shockwaves = [];
+        var shootingStars = [];
+        var bgStars = [];
+        var ambientSparks = [];
+        var lastLaunch = 0;
+        var lastShootingStar = 0;
+        var lastClickTime = 0;
+        var textCelebrated = false;
+        var mouse = { x: -999, y: -999, active: false };
+        var parallax = { x: 0, y: 0 };
+        var config = {
+          speed: 1.0,
+          constellation: true,
+          ambient: true,
+          palette: [
+            "#ffd54f",
+            "#ffb74d",
+            "#ff8a65",
+            "#4fc3f7",
+            "#81c784",
+            "#ba68c8",
+            "#fff176",
+            "#f06292",
+            "#64b5f6",
+            "#a5d6a7",
+          ],
+          selectedColors: null,
+          shape: "circle",
+        };
+        function rnd() {
+          return Math.random();
+        }
+        function now() {
+          return window.performance && performance.now
+            ? performance.now()
+            : Date.now();
+        }
+        function resize() {
+          var w = window.innerWidth;
+          var h = window.innerHeight;
+          [canvas, starsCanvas].forEach(function (c) {
+            c.style.width = w + "px";
+            c.style.height = h + "px";
+            c.width = w * dpr;
+            c.height = h * dpr;
           });
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          starsCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          initBgStars();
+          initAmbientSparks();
         }
-      } else {
-        count = 80 + (rnd() * 40) | 0;
-        baseSpeed = (1.5 + rnd() * 1.5) * config.speed;
-        for (var i2 = 0; i2 < count; i2++) {
-          var angle = (Math.PI * 2 * i2) / count;
-          var speed = baseSpeed + rnd() * 1.2;
-          particles.push({
-            x: fw.x,
-            y: fw.targetY,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed,
-            alpha: 1,
-            color: fw.color,
-            life: 120 + (rnd() * 60) | 0
-          });
-        }
-      }
-      for (var j = 0; j < 30; j++) {
-        particles.push({
-          x: fw.x,
-          y: fw.targetY,
-          vx: (rnd() - 0.5) * 0.6,
-          vy: (rnd() - 0.5) * 0.6,
-          alpha: 1,
-          color: "#ffffff",
-          life: 30 + (rnd() * 20) | 0
-        });
-      }
-    }
-    function createText(text) {
-      if (!text) return;
-      var maxLen = 10;
-      if (text.length > maxLen) text = text.slice(0, maxLen);
-      var w = canvas.width / dpr;
-      var h = canvas.height / dpr;
-      var offCanvas = document.createElement("canvas");
-      offCanvas.width = w;
-      offCanvas.height = h;
-      var off = offCanvas.getContext("2d");
-      off.clearRect(0, 0, w, h);
-      var margin = Math.floor(w * 0.06);
-      var fontSize = Math.min(w / (text.length * 0.8), h * 0.28);
-      off.fillStyle = "#ffffff";
-      off.textAlign = "center";
-      off.textBaseline = "middle";
-      var measure;
-      do {
-        off.font = "bold " + fontSize + "px sans-serif";
-        measure = off.measureText(text);
-        if (measure.width > (w - margin * 2)) {
-          fontSize -= 2;
-          if (fontSize < 18) break;
-        } else {
-          break;
-        }
-      } while (true);
-      off.fillText(text, w / 2, h / 2);
-      var step = Math.max(4, Math.floor(fontSize / 18));
-      var data = off.getImageData(0, 0, w, h).data;
-      var points = [];
-      for (var y = 0; y < h; y += step) {
-        for (var x = 0; x < w; x += step) {
-          var idx = (y * w + x) * 4 + 3;
-          if (data[idx] > 150) {
-            var clampedX = Math.max(margin, Math.min(w - margin, x));
-            var clampedY = Math.max(margin, Math.min(h - margin, y));
-            points.push({ x: clampedX, y: clampedY });
+        function initAmbientSparks() {
+          ambientSparks = [];
+          for (var i = 0; i < 28; i++) {
+            ambientSparks.push({
+              x: rnd() * window.innerWidth,
+              y: rnd() * window.innerHeight,
+              vx: (rnd() - 0.5) * 0.25,
+              vy: -0.15 - rnd() * 0.35,
+              size: 0.8 + rnd() * 1.8,
+              phase: rnd() * Math.PI * 2,
+              color: randomColor(),
+            });
           }
         }
-      }
-      if (!points.length) return;
-      points.sort(function(a, b){ return a.x === b.x ? a.y - b.y : a.x - b.x; });
-      textParticles = [];
-      var total = points.length;
-      var totalWriteTime = 2600;
-      var startTime = now();
-      for (var i2 = 0; i2 < points.length; i2++) {
-        var p = points[i2];
-        var delay = (i2 / total) * totalWriteTime;
-        textParticles.push({
-          x: w * (0.2 + 0.6 * rnd()),
-          y: h + rnd() * 40,
-          tx: p.x,
-          ty: p.y,
-          startTime: startTime + delay,
-          duration: 900,
-          color: randomColor(),
-          done: false,
-          seed: rnd()
-        });
-      }
-    }
-    function updateTextParticles(t) {
-      for (var i = textParticles.length - 1; i >= 0; i--) {
-        var p = textParticles[i];
-        if (p.done) {
-          var tw = (Math.sin((t * 0.001 + p.seed * 2) * 2 * Math.PI * 0.12) + 1) * 0.5; // 低频闪烁
-          var baseAlpha = 0.75;
-          var alpha = baseAlpha + tw * 0.25;
-          var radius = 1.3 + tw * 0.4;
-          ctx.globalAlpha = alpha;
-          ctx.fillStyle = p.color;
-          ctx.beginPath();
-          ctx.arc(p.tx, p.ty, radius, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.globalAlpha = 1;
-          continue;
+        function showToast(msg) {
+          var el = document.getElementById("toast");
+          if (!el) return;
+          el.textContent = msg;
+          el.classList.add("show");
+          clearTimeout(showToast._timer);
+          showToast._timer = setTimeout(function () {
+            el.classList.remove("show");
+          }, 2200);
         }
-        var dt = (t - p.startTime) / p.duration;
-        if (dt < 0) continue;
-        if (dt >= 1) {
-          p.done = true;
-          p.x = p.tx;
-          p.y = p.ty;
-          ctx.globalAlpha = 1;
-          ctx.fillStyle = p.color;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, 1.6, 0, Math.PI * 2);
-          ctx.fill();
-          continue;
+        function initBgStars() {
+          var w = window.innerWidth;
+          var h = window.innerHeight;
+          var count = Math.floor((w * h) / 8000);
+          bgStars = [];
+          for (var i = 0; i < count; i++) {
+            bgStars.push({
+              x: rnd() * w,
+              y: rnd() * h * 0.85,
+              r: rnd() * 1.6 + 0.3,
+              phase: rnd() * Math.PI * 2,
+              speed: 0.5 + rnd() * 2,
+            });
+          }
         }
-        var ease = dt;
-        p.x = p.x + (p.tx - p.x) * ease;
-        p.y = p.y + (p.ty - p.y) * ease;
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 1.6, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-    function tick() {
-      var t = now();
-      var w = canvas.width / dpr;
-      var h = canvas.height / dpr;
-      ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
-      ctx.fillRect(0, 0, w, h);
-      if (t - lastLaunch > 700 + rnd() * 600) {
-        spawnFirework();
-        lastLaunch = t;
-      }
-      for (var i = fireworks.length - 1; i >= 0; i--) {
-        var fw = fireworks[i];
-        fw.y -= fw.speed;
-        ctx.fillStyle = fw.color;
-        ctx.beginPath();
-        ctx.arc(fw.x, fw.y, 2.5, 0, Math.PI * 2);
-        ctx.fill();
-        if (!fw.exploded && fw.y <= fw.targetY) {
-          fw.exploded = true;
-          explode(fw);
-          fireworks.splice(i, 1);
+        function drawBgStars(t) {
+          var w = window.innerWidth;
+          var h = window.innerHeight;
+          starsCtx.clearRect(0, 0, w, h);
+          for (var i = 0; i < bgStars.length; i++) {
+            var s = bgStars[i];
+            var twinkle =
+              0.35 +
+              0.65 * (0.5 + 0.5 * Math.sin(t * 0.001 * s.speed + s.phase));
+            starsCtx.globalAlpha = twinkle;
+            starsCtx.fillStyle = s.r > 1.2 ? "#fffef0" : "#ffffff";
+            starsCtx.beginPath();
+            starsCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+            starsCtx.fill();
+          }
+          starsCtx.globalAlpha = 1;
+          if (config.constellation) drawConstellations();
         }
-      }
-      for (var j = particles.length - 1; j >= 0; j--) {
-        var p = particles[j];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.02;
-        p.alpha -= 1 / p.life;
-        if (p.alpha <= 0) {
-          particles.splice(j, 1);
-          continue;
+        function drawConstellations() {
+          var w = window.innerWidth;
+          var h = window.innerHeight;
+          var px = parallax.x * 0.3;
+          var py = parallax.y * 0.3;
+          var limit = Math.min(bgStars.length, 80);
+          starsCtx.strokeStyle = "rgba(180, 210, 255, 0.08)";
+          starsCtx.lineWidth = 0.6;
+          for (var i = 0; i < limit; i++) {
+            for (var j = i + 1; j < limit; j++) {
+              var a = bgStars[i];
+              var b = bgStars[j];
+              var dx = a.x + px - (b.x + px);
+              var dy = a.y + py - (b.y + py);
+              if (dx * dx + dy * dy < 3600) {
+                starsCtx.beginPath();
+                starsCtx.moveTo(a.x + px, a.y + py);
+                starsCtx.lineTo(b.x + px, b.y + py);
+                starsCtx.stroke();
+              }
+            }
+          }
         }
-        ctx.globalAlpha = p.alpha;
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = 1;
-      }
-      if (textParticles.length) updateTextParticles(t);
-      requestAnimationFrame(tick);
-    }
-    function bindControls() {
-      var input = document.getElementById("textInput");
-      var button = document.getElementById("launchButton");
-      if (!input || !button) return;
-      function trigger() {
-        var value = input.value.trim();
-        if (!value) value = input.getAttribute("placeholder") || "";
-        createText(value);
-      }
-      button.addEventListener("click", trigger);
-      input.addEventListener("keydown", function(e) {
-        if (e.key === "Enter" || e.keyCode === 13) trigger();
-      });
-      var settingsToggle = document.getElementById("settingsToggle");
-      var settingsPanel = document.getElementById("settingsPanel");
-      var speedRange = document.getElementById("speedRange");
-      var speedLabel = document.getElementById("speedLabel");
-      var colorPalette = document.getElementById("colorPalette");
-      var shapeInputs = document.querySelectorAll('input[name="shape"]');
-      function setPanelVisible(visible) {
-        settingsPanel.style.display = visible ? "block" : "none";
-      }
-      settingsToggle.addEventListener("click", function() {
-        var visible = settingsPanel.style.display !== "block";
-        setPanelVisible(visible);
-      });
-      document.addEventListener("click", function(e) {
-        var within = settingsPanel.contains(e.target) || settingsToggle.contains(e.target);
-        if (!within) setPanelVisible(false);
-      });
-      speedRange.addEventListener("input", function() {
-        var val = Number(speedRange.value) / 100;
-        config.speed = Math.max(0.3, Math.min(2.0, val));
-        speedLabel.textContent = "x" + config.speed.toFixed(2);
-      });
-      function updateSelectedColors() {
-        var chips = colorPalette.querySelectorAll(".chip.selected");
-        config.selectedColors = Array.prototype.map.call(chips, function(el){ return el.getAttribute("data-color"); });
-      }
-      colorPalette.addEventListener("click", function(e) {
-        var target = e.target;
-        if (!target.classList.contains("chip")) return;
-        target.classList.toggle("selected");
-        updateSelectedColors();
-      });
-      updateSelectedColors();
-      shapeInputs.forEach(function(radio){
-        radio.addEventListener("change", function() {
-          if (radio.checked) config.shape = radio.value;
-        });
-      });
-    }
-    window.addEventListener("resize", resize);
-    resize();
-    bindControls();
-    tick();
-  })();
-  </script>
-</body>
+        function updateAmbientSparks(t) {
+          if (!config.ambient) return;
+          var w = window.innerWidth;
+          var h = window.innerHeight;
+          for (var i = 0; i < ambientSparks.length; i++) {
+            var s = ambientSparks[i];
+            s.x += s.vx;
+            s.y += s.vy;
+            if (s.y < -10) {
+              s.y = h + 10;
+              s.x = rnd() * w;
+            }
+            if (s.x < -10) s.x = w + 10;
+            if (s.x > w + 10) s.x = -10;
+            var glow =
+              0.25 + 0.35 * (0.5 + 0.5 * Math.sin(t * 0.002 + s.phase));
+            starsCtx.globalAlpha = glow;
+            starsCtx.fillStyle = s.color;
+            starsCtx.beginPath();
+            starsCtx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+            starsCtx.fill();
+          }
+          starsCtx.globalAlpha = 1;
+        }
+        function spawnShootingStar() {
+          var w = window.innerWidth;
+          var h = window.innerHeight;
+          shootingStars.push({
+            x: rnd() * w * 0.8,
+            y: rnd() * h * 0.3,
+            len: 60 + rnd() * 80,
+            speed: (6 + rnd() * 8) * config.speed,
+            angle: Math.PI / 4 + (rnd() - 0.5) * 0.3,
+            alpha: 1,
+            color: rnd() > 0.5 ? "#ffffff" : randomColor(),
+          });
+        }
+        function updateShootingStars() {
+          var w = window.innerWidth;
+          var h = window.innerHeight;
+          for (var i = shootingStars.length - 1; i >= 0; i--) {
+            var s = shootingStars[i];
+            s.x += Math.cos(s.angle) * s.speed;
+            s.y += Math.sin(s.angle) * s.speed;
+            s.alpha -= 0.018;
+            if (s.alpha <= 0 || s.x > w + 100 || s.y > h + 100) {
+              shootingStars.splice(i, 1);
+              continue;
+            }
+            var tailX = s.x - Math.cos(s.angle) * s.len;
+            var tailY = s.y - Math.sin(s.angle) * s.len;
+            var grad = starsCtx.createLinearGradient(tailX, tailY, s.x, s.y);
+            grad.addColorStop(0, "rgba(255,255,255,0)");
+            grad.addColorStop(
+              1,
+              s.color.charAt(0) === "#"
+                ? hexToRgba(s.color, s.alpha)
+                : "rgba(255,255,255," + s.alpha + ")",
+            );
+            starsCtx.strokeStyle = grad;
+            starsCtx.lineWidth = 2;
+            starsCtx.beginPath();
+            starsCtx.moveTo(tailX, tailY);
+            starsCtx.lineTo(s.x, s.y);
+            starsCtx.stroke();
+            starsCtx.fillStyle = "rgba(255,255,255," + s.alpha + ")";
+            starsCtx.beginPath();
+            starsCtx.arc(s.x, s.y, 2, 0, Math.PI * 2);
+            starsCtx.fill();
+          }
+        }
+        function hexToRgba(hex, alpha) {
+          var r = parseInt(hex.slice(1, 3), 16);
+          var g = parseInt(hex.slice(3, 5), 16);
+          var b = parseInt(hex.slice(5, 7), 16);
+          return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
+        }
+        function spawnMouseTrail(x, y) {
+          for (var i = 0; i < 2; i++) {
+            mouseTrails.push({
+              x: x + (rnd() - 0.5) * 8,
+              y: y + (rnd() - 0.5) * 8,
+              vx: (rnd() - 0.5) * 0.8,
+              vy: (rnd() - 0.5) * 0.8 - 0.3,
+              life: (25 + rnd() * 20) | 0,
+              color: randomColor(),
+              size: 1 + rnd() * 2,
+            });
+          }
+        }
+        function randomColor() {
+          var base =
+            config.selectedColors && config.selectedColors.length
+              ? config.selectedColors
+              : config.palette;
+          return base[(base.length * rnd()) | 0];
+        }
+        function spawnFirework(optX, optTargetY) {
+          var w = canvas.width / dpr;
+          var h = canvas.height / dpr;
+          fireworks.push({
+            x: optX != null ? optX : w * (0.1 + 0.8 * rnd()),
+            y: h + 10,
+            targetY: optTargetY != null ? optTargetY : h * (0.2 + 0.3 * rnd()),
+            speed: (4 + 2 * rnd()) * config.speed,
+            color: randomColor(),
+            exploded: false,
+            trail: [],
+          });
+        }
+        function starPoint(angle, outerR, innerR) {
+          var a1 = angle - Math.PI / 10;
+          var a2 = angle;
+          return {
+            ox: Math.cos(a1) * outerR,
+            oy: Math.sin(a1) * outerR,
+            ix: Math.cos(a2) * innerR,
+            iy: Math.sin(a2) * innerR,
+          };
+        }
+        function explode(fw) {
+          var count, baseSpeed;
+          shockwaves.push({
+            x: fw.x,
+            y: fw.targetY,
+            radius: 0,
+            maxRadius: 80 + rnd() * 60,
+            alpha: 0.7,
+            color: fw.color,
+          });
+          if (config.shape === "heart") {
+            count = 180;
+            baseSpeed = 0.5 * config.speed;
+            var minDim = Math.min(canvas.width / dpr, canvas.height / dpr);
+            var scale = Math.max(2.0, Math.min(3.6, minDim / 180));
+            for (var i = 0; i < count; i++) {
+              var t = (Math.PI * 2 * i) / count;
+              var hx = Math.pow(Math.sin(t), 3);
+              var hy =
+                0.8125 * Math.cos(t) -
+                0.3125 * Math.cos(2 * t) -
+                0.125 * Math.cos(3 * t) -
+                0.0625 * Math.cos(4 * t);
+              var dx = hx * scale;
+              var dy = -hy * scale;
+              var jitter = 0.15;
+              var vx = dx * (1.2 + rnd() * 0.3) + (rnd() - 0.5) * jitter;
+              var vy = dy * (1.2 + rnd() * 0.3) + (rnd() - 0.5) * jitter;
+              particles.push({
+                x: fw.x,
+                y: fw.targetY,
+                vx: vx * baseSpeed,
+                vy: vy * baseSpeed,
+                alpha: 1,
+                color: fw.color,
+                life: (120 + rnd() * 60) | 0,
+              });
+            }
+          } else if (config.shape === "star") {
+            count = 200;
+            baseSpeed = 0.55 * config.speed;
+            var minDim2 = Math.min(canvas.width / dpr, canvas.height / dpr);
+            var starScale = Math.max(2.2, Math.min(4.0, minDim2 / 160));
+            var outerR = starScale;
+            var innerR = starScale * 0.42;
+            for (var si = 0; si < 5; si++) {
+              var baseAngle = -Math.PI / 2 + (si * Math.PI * 2) / 5;
+              var sp = starPoint(baseAngle, outerR, innerR);
+              var nextAngle = baseAngle + Math.PI / 5;
+              var sp2 = starPoint(nextAngle, outerR, innerR);
+              var segments = 40;
+              for (var seg = 0; seg <= segments; seg++) {
+                var t2 = seg / segments;
+                var px = sp.ox + (sp2.ix - sp.ox) * t2;
+                var py = sp.oy + (sp2.iy - sp.oy) * t2;
+                var len = Math.sqrt(px * px + py * py) || 1;
+                var jitter2 = 0.12;
+                particles.push({
+                  x: fw.x,
+                  y: fw.targetY,
+                  vx:
+                    (px / len) * baseSpeed * (1.1 + rnd() * 0.25) +
+                    (rnd() - 0.5) * jitter2,
+                  vy:
+                    (py / len) * baseSpeed * (1.1 + rnd() * 0.25) +
+                    (rnd() - 0.5) * jitter2,
+                  alpha: 1,
+                  color: fw.color,
+                  life: (130 + rnd() * 50) | 0,
+                });
+              }
+            }
+          } else if (config.shape === "butterfly") {
+            baseSpeed = 0.48 * config.speed;
+            var minDim3 = Math.min(canvas.width / dpr, canvas.height / dpr);
+            var bScale = Math.max(2.0, Math.min(3.5, minDim3 / 200));
+            for (var bi = 0; bi < 360; bi++) {
+              var bt = (bi / 360) * Math.PI * 4;
+              var br =
+                Math.exp(Math.cos(bt)) * (2 - Math.cos(4 * bt)) -
+                Math.pow(Math.sin(bt / 12), 5);
+              var bx = Math.sin(bt) * br * bScale * 0.35;
+              var by = -Math.cos(bt) * br * bScale * 0.35;
+              var blen = Math.sqrt(bx * bx + by * by) || 1;
+              particles.push({
+                x: fw.x,
+                y: fw.targetY,
+                vx: (bx / blen) * baseSpeed * (1 + rnd() * 0.2),
+                vy: (by / blen) * baseSpeed * (1 + rnd() * 0.2),
+                alpha: 1,
+                color: bi % 3 === 0 ? randomColor() : fw.color,
+                life: (140 + rnd() * 50) | 0,
+              });
+            }
+          } else if (config.shape === "ring") {
+            count = 120;
+            baseSpeed = (2.0 + rnd() * 0.8) * config.speed;
+            for (var ri = 0; ri < count; ri++) {
+              var ringAngle = (Math.PI * 2 * ri) / count;
+              particles.push({
+                x: fw.x,
+                y: fw.targetY,
+                vx: Math.cos(ringAngle) * baseSpeed,
+                vy: Math.sin(ringAngle) * baseSpeed,
+                alpha: 1,
+                color: randomColor(),
+                life: (100 + rnd() * 40) | 0,
+                ring: true,
+              });
+            }
+            for (var ri2 = 0; ri2 < 40; ri2++) {
+              var innerAngle = rnd() * Math.PI * 2;
+              var innerSpeed = baseSpeed * (0.15 + rnd() * 0.25);
+              particles.push({
+                x: fw.x,
+                y: fw.targetY,
+                vx: Math.cos(innerAngle) * innerSpeed,
+                vy: Math.sin(innerAngle) * innerSpeed,
+                alpha: 1,
+                color: "#ffffff",
+                life: (60 + rnd() * 30) | 0,
+              });
+            }
+          } else {
+            count = (80 + rnd() * 40) | 0;
+            baseSpeed = (1.5 + rnd() * 1.5) * config.speed;
+            for (var i2 = 0; i2 < count; i2++) {
+              var angle = (Math.PI * 2 * i2) / count;
+              var speed = baseSpeed + rnd() * 1.2;
+              particles.push({
+                x: fw.x,
+                y: fw.targetY,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                alpha: 1,
+                color: fw.color,
+                life: (120 + rnd() * 60) | 0,
+              });
+            }
+          }
+          for (var j = 0; j < 30; j++) {
+            particles.push({
+              x: fw.x,
+              y: fw.targetY,
+              vx: (rnd() - 0.5) * 0.6,
+              vy: (rnd() - 0.5) * 0.6,
+              alpha: 1,
+              color: "#ffffff",
+              life: (30 + rnd() * 20) | 0,
+            });
+          }
+        }
+        function createText(text) {
+          if (!text) return;
+          var maxLen = 10;
+          if (text.length > maxLen) text = text.slice(0, maxLen);
+          var w = canvas.width / dpr;
+          var h = canvas.height / dpr;
+          var offCanvas = document.createElement("canvas");
+          offCanvas.width = w;
+          offCanvas.height = h;
+          var off = offCanvas.getContext("2d");
+          off.clearRect(0, 0, w, h);
+          var margin = Math.floor(w * 0.06);
+          var fontSize = Math.min(w / (text.length * 0.8), h * 0.28);
+          off.fillStyle = "#ffffff";
+          off.textAlign = "center";
+          off.textBaseline = "middle";
+          var measure;
+          do {
+            off.font = "bold " + fontSize + "px sans-serif";
+            measure = off.measureText(text);
+            if (measure.width > w - margin * 2) {
+              fontSize -= 2;
+              if (fontSize < 18) break;
+            } else {
+              break;
+            }
+          } while (true);
+          off.fillText(text, w / 2, h / 2);
+          var step = Math.max(4, Math.floor(fontSize / 18));
+          var data = off.getImageData(0, 0, w, h).data;
+          var points = [];
+          for (var y = 0; y < h; y += step) {
+            for (var x = 0; x < w; x += step) {
+              var idx = (y * w + x) * 4 + 3;
+              if (data[idx] > 150) {
+                var clampedX = Math.max(margin, Math.min(w - margin, x));
+                var clampedY = Math.max(margin, Math.min(h - margin, y));
+                points.push({ x: clampedX, y: clampedY });
+              }
+            }
+          }
+          if (!points.length) return;
+          points.sort(function (a, b) {
+            return a.x === b.x ? a.y - b.y : a.x - b.x;
+          });
+          textParticles = [];
+          var total = points.length;
+          var totalWriteTime = 2600;
+          var startTime = now();
+          for (var i2 = 0; i2 < points.length; i2++) {
+            var p = points[i2];
+            var delay = (i2 / total) * totalWriteTime;
+            textParticles.push({
+              x: w * (0.2 + 0.6 * rnd()),
+              y: h + rnd() * 40,
+              tx: p.x,
+              ty: p.y,
+              startTime: startTime + delay,
+              duration: 900,
+              color: randomColor(),
+              done: false,
+              seed: rnd(),
+            });
+          }
+        }
+        function checkTextCelebration() {
+          if (!textParticles.length || textCelebrated) return;
+          var allDone = true;
+          for (var i = 0; i < textParticles.length; i++) {
+            if (!textParticles[i].done) {
+              allDone = false;
+              break;
+            }
+          }
+          if (allDone) {
+            textCelebrated = true;
+            showToast("✨ 星光文字书写完成！");
+            var w = canvas.width / dpr;
+            for (var b = 0; b < 8; b++) {
+              setTimeout(
+                function (idx) {
+                  spawnFirework(w * (0.15 + idx * 0.1), canvas.height / dpr * 0.35);
+                },
+                b * 200,
+                b,
+              );
+            }
+          }
+        }
+        function updateTextParticles(t) {
+          for (var i = textParticles.length - 1; i >= 0; i--) {
+            var p = textParticles[i];
+            if (p.done) {
+              var tw =
+                (Math.sin((t * 0.001 + p.seed * 2) * 2 * Math.PI * 0.12) + 1) *
+                0.5; // 低频闪烁
+              var baseAlpha = 0.75;
+              var alpha = baseAlpha + tw * 0.25;
+              var radius = 1.3 + tw * 0.4;
+              ctx.globalAlpha = alpha;
+              ctx.fillStyle = p.color;
+              ctx.beginPath();
+              ctx.arc(p.tx, p.ty, radius, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.globalAlpha = 1;
+              continue;
+            }
+            var dt = (t - p.startTime) / p.duration;
+            if (dt < 0) continue;
+            if (dt >= 1) {
+              p.done = true;
+              p.x = p.tx;
+              p.y = p.ty;
+              ctx.globalAlpha = 1;
+              ctx.fillStyle = p.color;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, 1.6, 0, Math.PI * 2);
+              ctx.fill();
+              continue;
+            }
+            var ease = dt;
+            p.x = p.x + (p.tx - p.x) * ease;
+            p.y = p.y + (p.ty - p.y) * ease;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 1.6, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          checkTextCelebration();
+        }
+        function megaBurst(x, y) {
+          var h = canvas.height / dpr;
+          var shapes = ["circle", "heart", "star", "ring", "butterfly"];
+          var saved = config.shape;
+          showToast("🎆 超级彩蛋触发！");
+          for (var i = 0; i < 12; i++) {
+            (function (idx) {
+              setTimeout(function () {
+                config.shape = shapes[idx % shapes.length];
+                spawnFirework(
+                  x + (rnd() - 0.5) * 160,
+                  Math.max(h * 0.1, y - rnd() * 120),
+                );
+              }, idx * 120);
+            })(i);
+          }
+          setTimeout(function () {
+            config.shape = saved;
+          }, 1600);
+          for (var s = 0; s < 4; s++) {
+            setTimeout(spawnShootingStar, s * 300);
+          }
+        }
+        function updateShockwaves() {
+          for (var i = shockwaves.length - 1; i >= 0; i--) {
+            var sw = shockwaves[i];
+            sw.radius += 2.5 * config.speed;
+            sw.alpha -= 0.015;
+            if (sw.alpha <= 0) {
+              shockwaves.splice(i, 1);
+              continue;
+            }
+            ctx.globalAlpha = sw.alpha;
+            ctx.strokeStyle = sw.color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+          }
+        }
+        function updateMouseTrails() {
+          for (var i = mouseTrails.length - 1; i >= 0; i--) {
+            var m = mouseTrails[i];
+            m.x += m.vx;
+            m.y += m.vy;
+            m.life--;
+            if (m.life <= 0) {
+              mouseTrails.splice(i, 1);
+              continue;
+            }
+            ctx.globalAlpha = m.life / 45;
+            ctx.fillStyle = m.color;
+            ctx.beginPath();
+            ctx.arc(m.x, m.y, m.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+          }
+        }
+        function tick() {
+          var t = now();
+          var w = canvas.width / dpr;
+          var h = canvas.height / dpr;
+          drawBgStars(t);
+          if (t - lastShootingStar > 2500 + rnd() * 4000) {
+            spawnShootingStar();
+            lastShootingStar = t;
+          }
+          updateShootingStars();
+          ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+          ctx.fillRect(0, 0, w, h);
+          if (t - lastLaunch > 700 + rnd() * 600) {
+            spawnFirework();
+            lastLaunch = t;
+          }
+          if (mouse.active) spawnMouseTrail(mouse.x, mouse.y);
+          for (var i = fireworks.length - 1; i >= 0; i--) {
+            var fw = fireworks[i];
+            fw.y -= fw.speed;
+            fw.trail.push({ x: fw.x, y: fw.y, alpha: 1 });
+            if (fw.trail.length > 12) fw.trail.shift();
+            for (var ti = 0; ti < fw.trail.length; ti++) {
+              var tr = fw.trail[ti];
+              tr.alpha *= 0.82;
+              ctx.globalAlpha = tr.alpha * 0.6;
+              ctx.fillStyle = fw.color;
+              ctx.beginPath();
+              ctx.arc(tr.x, tr.y, 1.5, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = fw.color;
+            ctx.shadowColor = fw.color;
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.arc(fw.x, fw.y, 3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            if (!fw.exploded && fw.y <= fw.targetY) {
+              fw.exploded = true;
+              explode(fw);
+              fireworks.splice(i, 1);
+            }
+          }
+          updateShockwaves();
+          for (var j = particles.length - 1; j >= 0; j--) {
+            var p = particles[j];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += p.ring ? 0.008 : 0.02;
+            p.alpha -= 1 / p.life;
+            if (p.alpha <= 0) {
+              particles.splice(j, 1);
+              continue;
+            }
+            ctx.globalAlpha = p.alpha;
+            ctx.fillStyle = p.color;
+            ctx.shadowColor = p.color;
+            ctx.shadowBlur = p.ring ? 6 : 3;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.ring ? 1.8 : 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.globalAlpha = 1;
+          }
+          updateMouseTrails();
+          if (textParticles.length) updateTextParticles(t);
+          requestAnimationFrame(tick);
+        }
+        function bindControls() {
+          var input = document.getElementById("textInput");
+          var button = document.getElementById("launchButton");
+          if (!input || !button) return;
+          function trigger() {
+            var value = input.value.trim();
+            if (!value) value = input.getAttribute("placeholder") || "";
+            createText(value);
+          }
+          button.addEventListener("click", trigger);
+          input.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" || e.keyCode === 13) trigger();
+          });
+          var settingsToggle = document.getElementById("settingsToggle");
+          var settingsPanel = document.getElementById("settingsPanel");
+          var speedRange = document.getElementById("speedRange");
+          var speedLabel = document.getElementById("speedLabel");
+          var colorPalette = document.getElementById("colorPalette");
+          var shapeInputs = document.querySelectorAll('input[name="shape"]');
+          function setPanelVisible(visible) {
+            settingsPanel.style.display = visible ? "block" : "none";
+          }
+          settingsToggle.addEventListener("click", function () {
+            var visible = settingsPanel.style.display !== "block";
+            setPanelVisible(visible);
+          });
+          document.addEventListener("click", function (e) {
+            var within =
+              settingsPanel.contains(e.target) ||
+              settingsToggle.contains(e.target);
+            if (!within) setPanelVisible(false);
+          });
+          speedRange.addEventListener("input", function () {
+            var val = Number(speedRange.value) / 100;
+            config.speed = Math.max(0.3, Math.min(2.0, val));
+            speedLabel.textContent = "x" + config.speed.toFixed(2);
+          });
+          function updateSelectedColors() {
+            var chips = colorPalette.querySelectorAll(".chip.selected");
+            config.selectedColors = Array.prototype.map.call(
+              chips,
+              function (el) {
+                return el.getAttribute("data-color");
+              },
+            );
+          }
+          colorPalette.addEventListener("click", function (e) {
+            var target = e.target;
+            if (!target.classList.contains("chip")) return;
+            target.classList.toggle("selected");
+            updateSelectedColors();
+          });
+          updateSelectedColors();
+          shapeInputs.forEach(function (radio) {
+            radio.addEventListener("change", function () {
+              if (radio.checked) config.shape = radio.value;
+            });
+          });
+        }
+        function bindInteraction() {
+          canvas.addEventListener("mousemove", function (e) {
+            var rect = canvas.getBoundingClientRect();
+            mouse.x = e.clientX - rect.left;
+            mouse.y = e.clientY - rect.top;
+            mouse.active = true;
+          });
+          canvas.addEventListener("mouseleave", function () {
+            mouse.active = false;
+          });
+          canvas.addEventListener("click", function (e) {
+            var rect = canvas.getBoundingClientRect();
+            var x = e.clientX - rect.left;
+            var y = e.clientY - rect.top;
+            var h = canvas.height / dpr;
+            spawnFirework(x, Math.max(h * 0.12, y));
+            for (var burst = 0; burst < 3; burst++) {
+              setTimeout(function () {
+                spawnFirework(
+                  x + (rnd() - 0.5) * 80,
+                  Math.max(h * 0.12, y - rnd() * 60),
+                );
+              }, burst * 180);
+            }
+          });
+          canvas.addEventListener(
+            "touchstart",
+            function (e) {
+              if (!e.touches.length) return;
+              var touch = e.touches[0];
+              var rect = canvas.getBoundingClientRect();
+              var x = touch.clientX - rect.left;
+              var y = touch.clientY - rect.top;
+              var h = canvas.height / dpr;
+              spawnFirework(x, Math.max(h * 0.12, y));
+            },
+            { passive: true },
+          );
+        }
+        function welcomeShow() {
+          setTimeout(function () {
+            createText("柚子");
+            for (var i = 0; i < 5; i++) {
+              setTimeout(function () {
+                spawnFirework();
+              }, i * 350);
+            }
+          }, 800);
+        }
+        window.addEventListener("resize", resize);
+        resize();
+        bindControls();
+        bindInteraction();
+        welcomeShow();
+        tick();
+      })();
+    </script>
+  </body>
 </html>
